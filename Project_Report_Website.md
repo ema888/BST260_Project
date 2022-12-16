@@ -70,9 +70,9 @@ and 6 columns:
 
 6.  Severity (binary, 0 = benign and 1 = malignant) **OUTCOME**
 
-The distribution of the covariates is seen in Figure 1, where I plotted
-each covariate distribution as a histogram by whether the outcome was
-malignant or benign.  
+The distribution of the covariates is seen in the figure below, where I
+plotted each covariate distribution as a histogram by whether the
+outcome was malignant or benign.  
 ![](Project_Report_Website_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 ### Dealing with Missingness and Filting the Data
@@ -83,12 +83,12 @@ the image. Since my study is only looking at those who have never been
 diagnosed with breast cancer before, I decided to filter out the 0 and 6
 values in the BI-RADS category so that the data would better suit the
 scope of my project. Upon looking at the distribution of the missingness
-for each covariate (Figure 2), I concluded that my data was very likely
-missing not at random, and given that, I could not use multiple
-imputation methods, as it assumes the data is either missing at random
-or missing completely at random. After contemplation, I concluded that a
-complete cases analysis was most appropriate since we are not able to
-make any assumptions about the NAs, and there would be enough
+for each covariate, as seen in the table below, I concluded that my data
+was very likely missing not at random, and given that, I could not use
+multiple imputation methods, as it assumes the data is either missing at
+random or missing completely at random. After contemplation, I concluded
+that a complete cases analysis was most appropriate since we are not
+able to make any assumptions about the NAs, and there would be enough
 observations (rows) left over after filtering for complete cases to
 build our predictive model.
 
@@ -117,7 +117,7 @@ optimizes the accuracy of the combined models.
 ## Results:
 
 Upon looking at the distributions of each covariate by outcome, as seen
-in Figure 1, I found that there was little difference in the
+in the histograms above, I found that there was little difference in the
 distribution of the density covariate between those who had benign
 masses versus those who had malignant masses. I wanted to see if the
 density covariate was appropriate to leave within my modeling, so I used
@@ -132,11 +132,11 @@ in the prediction modeling.
 
     ## 6 x 1 sparse Matrix of class "dgCMatrix"
     ##                       s0
-    ## (Intercept) -13.38544597
-    ## BI.RADS       2.10176158
-    ## Age           0.04167974
-    ## Shape         0.38635665
-    ## Margin        0.26171454
+    ## (Intercept) -13.20490643
+    ## BI.RADS       2.07831946
+    ## Age           0.04066338
+    ## Shape         0.38135348
+    ## Margin        0.25916079
     ## Density       .
 
 For the purpose of this project, the random seed was set at ‘123’. Since
@@ -155,20 +155,17 @@ modeled/fitted outcomes could be compared with the real outcomes.
 For the logistic regression, I used linear terms, as adding quadratic
 terms did not seem to contribute much to improving the fit of the data.
 The model used consisted of the 4 remaining covariates: BI-RADS, Age,
-Shape, and Margin. The model of the odds of having a malignant mass is:
-
-$$
-log(\widehat{odds}) = \beta_{0} + \beta_{1} * X_{BIRADS} + \beta{2} * X_{Age} + \beta{3} * X_{Shape} + \beta{4} * X_{Margin}
-$$ I used the *caret* package to cross validate and train my logistic
-model. A 10-fold cross validation was used to obtain the coefficients
-that best fitted my data, as seen in the table below. The summary shows
-that all of the covariates are statistically significant with p-values
-less than 0.05. Additionally, while holding all other covariates
-constant, on average, those with a 1-unit higher BI-RADS score have
-8.8976 times the odds of having a malignant mass than those who have a
-1-unit lower BI-RADS score. This makes sense since the BI-RADS score is
-a physician-assigned evaluation that should be most indicative of the
-other variables on whether the mass seems suspicious or not.
+Shape, and Margin. I used the *caret* package to cross validate and
+train my logistic model. A 10-fold cross validation was used to obtain
+the coefficients that best fitted my data, as seen in the table below.
+The summary shows that all of the covariates are statistically
+significant with p-values less than 0.05. Additionally, while holding
+all other covariates constant, on average, those with a 1-unit higher
+BI-RADS score have 8.8976 times the odds of having a malignant mass than
+those who have a 1-unit lower BI-RADS score. This makes sense since the
+BI-RADS score is a physician-assigned evaluation that should be most
+indicative of the other variables on whether the mass seems suspicious
+or not.
 
     ## Warning: `repeats` has no meaning for this resampling method.
 

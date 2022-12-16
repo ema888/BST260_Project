@@ -3,6 +3,7 @@ title: "Using Mammogram Data to Predict Breast Mass Malignancies in Females with
 author: "Erica Ma"
 date: "2022-12-15"
 output: github_document
+  
 ---
 ```{r, echo = FALSE, include = FALSE}
 # Import necessary packages: 
@@ -83,7 +84,7 @@ The goal of this project is to create predictive models based on mammogram scree
 
 6. Severity (binary, 0 = benign and 1 = malignant) **OUTCOME**  
 
-The distribution of the covariates is seen in Figure 1, where I plotted each covariate distribution as a histogram by whether the outcome was malignant or benign.   
+The distribution of the covariates is seen in the figure below, where I plotted each covariate distribution as a histogram by whether the outcome was malignant or benign.   
 ```{r, echo = FALSE}
 # Figure 1
 a = complete_data %>% ggplot(aes(x = BI.RADS)) + geom_histogram(color = "black", fill = "red", alpha = 0.5, binwidth = 1) + facet_wrap(~Severity)
@@ -101,7 +102,7 @@ ggarrange(a, b, c, d, e, ncol = 2, nrow = 3, labels = c("BI.RADS", "Age", "Shape
 
 
 ### Dealing with Missingness and Filting the Data
-The BI-RADS category is an assessment tool used to rate mammogram screens, and the score is usually assigned by the radiologist reviewing the image. Since my study is only looking at those who have never been diagnosed with breast cancer before, I decided to filter out the 0 and 6 values in the BI-RADS category so that the data would better suit the scope of my project. Upon looking at the distribution of the missingness for each covariate (Figure 2), I concluded that my data was very likely missing not at random, and given that, I could not use multiple imputation methods, as it assumes the data is either missing at random or missing completely at random. After contemplation, I concluded that a complete cases analysis was most appropriate since we are not able to make any assumptions about the NAs, and there would be enough observations (rows) left over after filtering for complete cases to build our predictive model. 
+The BI-RADS category is an assessment tool used to rate mammogram screens, and the score is usually assigned by the radiologist reviewing the image. Since my study is only looking at those who have never been diagnosed with breast cancer before, I decided to filter out the 0 and 6 values in the BI-RADS category so that the data would better suit the scope of my project. Upon looking at the distribution of the missingness for each covariate, as seen in the table below, I concluded that my data was very likely missing not at random, and given that, I could not use multiple imputation methods, as it assumes the data is either missing at random or missing completely at random. After contemplation, I concluded that a complete cases analysis was most appropriate since we are not able to make any assumptions about the NAs, and there would be enough observations (rows) left over after filtering for complete cases to build our predictive model. 
 
 ```{r, echo = FALSE}
 mammogram_data %>% group_by(Severity) %>%
@@ -116,7 +117,7 @@ To build my models, I decided to use a logistic regression model with 10-fold cr
 
 ## Results:  
 
-Upon looking at the distributions of each covariate by outcome, as seen in Figure 1, I found that there was little difference in the distribution of the density covariate between those who had benign masses versus those who had malignant masses. I wanted to see if the density covariate was appropriate to leave within my modeling, so I used a lasso regression that could penalize any insignificant predictors. The results of the lasso regression showed me that Density could be neglected in our analysis. After this determination, I removed the density covariate from my analysis, which allowed me to retain more observations for my modeling (decreased missingness to 7.7%, which is close to the 5% missingness threshold for complete cases). The results of removing the missing data was a remaining 872 observations to be used in the prediction modeling.
+Upon looking at the distributions of each covariate by outcome, as seen in the histograms above, I found that there was little difference in the distribution of the density covariate between those who had benign masses versus those who had malignant masses. I wanted to see if the density covariate was appropriate to leave within my modeling, so I used a lasso regression that could penalize any insignificant predictors. The results of the lasso regression showed me that Density could be neglected in our analysis. After this determination, I removed the density covariate from my analysis, which allowed me to retain more observations for my modeling (decreased missingness to 7.7%, which is close to the 5% missingness threshold for complete cases). The results of removing the missing data was a remaining 872 observations to be used in the prediction modeling.
 
 ```{r, echo = FALSE}
 x_complete <- complete_data %>% select(-Severity)
@@ -141,12 +142,7 @@ For the purpose of this project, the random seed was set at '123'. Since the goa
 
 ### Logistic Regression Model with Cross-Validation   
 
-For the logistic regression, I used linear terms, as adding quadratic terms did not seem to contribute much to improving the fit of the data. The model used consisted of the 4 remaining covariates: BI-RADS, Age, Shape, and Margin. The model of the odds of having a malignant mass is: 
-
-$$
-log(\widehat{odds}) = \beta_{0} + \beta_{1} * X_{BIRADS} + \beta{2} * X_{Age} + \beta{3} * X_{Shape} + \beta{4} * X_{Margin}
-$$
-I used the _caret_ package to cross validate and train my logistic model. A 10-fold cross validation was used to obtain the coefficients that best fitted my data, as seen in the table below. The summary shows that all of the covariates are statistically significant with p-values less than 0.05. Additionally, while holding all other covariates constant, on average, those with a 1-unit higher BI-RADS score have 8.8976 times the odds of having a malignant mass than those who have a 1-unit lower BI-RADS score. This makes sense since the BI-RADS score is a physician-assigned evaluation that should be most indicative of the other variables on whether the mass seems suspicious or not. 
+For the logistic regression, I used linear terms, as adding quadratic terms did not seem to contribute much to improving the fit of the data. The model used consisted of the 4 remaining covariates: BI-RADS, Age, Shape, and Margin. I used the _caret_ package to cross validate and train my logistic model. A 10-fold cross validation was used to obtain the coefficients that best fitted my data, as seen in the table below. The summary shows that all of the covariates are statistically significant with p-values less than 0.05. Additionally, while holding all other covariates constant, on average, those with a 1-unit higher BI-RADS score have 8.8976 times the odds of having a malignant mass than those who have a 1-unit lower BI-RADS score. This makes sense since the BI-RADS score is a physician-assigned evaluation that should be most indicative of the other variables on whether the mass seems suspicious or not. 
 
 ```{r, echo = FALSE}
 # Set seed
